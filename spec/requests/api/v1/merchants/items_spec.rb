@@ -4,7 +4,7 @@ RSpec.describe "Merchant's Items API" do
     FactoryBot.reload
     merchant = create(:merchant)
     items = create_list(:item, 7, merchant: merchant)
-    get "/api/v1/merchants/1/items"
+    get '/api/v1/merchants/1/items'
   end
 
   describe 'Happy Path' do
