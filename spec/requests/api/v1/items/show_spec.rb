@@ -12,7 +12,7 @@ RSpec.describe 'Items Show API' do
       get '/api/v1/items/7'
       expect(response).to be_successful
       item = JSON.parse(response.body, symbolize_names: true)
-      expect(merchant.count).to eq(1)
+      expect(item.count).to eq(1)
     end
   end
 
