@@ -17,9 +17,10 @@ RSpec.describe 'Items New API' do
         merchant_id: merchant.id
       }
 
-      post '/api/v1/items', params: item_params
+      post "/api/v1/items", params: item_params
       expect(Item.count).to eq(2)
-      #what to expect for status?
+#TODO how to test for json response hash for Item
+#TODO how to test for status
     end
 
     # it 'can delete item' do
