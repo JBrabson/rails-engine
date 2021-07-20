@@ -1,5 +1,5 @@
 require 'rails_helper'
-RSpec.describe 'Merchants API' do
+RSpec.describe "Merchant's Items API" do
   before :each do
     FactoryBot.reload
     merchant = create(:merchant)
@@ -7,7 +7,7 @@ RSpec.describe 'Merchants API' do
     get "/api/v1/merchants/1/items"
   end
 
-  describe 'Merchant Items Index Page' do
+  describe 'Happy Path' do
     it "returns list of merchant's items" do
       expect(response).to be_successful
       items = JSON.parse(response.body, symbolize_names: true)
@@ -26,8 +26,10 @@ RSpec.describe 'Merchants API' do
     end
   end
 
-  # describe 'Sad Path' do
-  #   it '' do
-  #   end
-  # end
+  describe 'Sad Path' do
+    it 'returns 404 with invalid id' do
+      get '/api/v1/merchants/2/items'
+      expect(response).to have_http_status(404)
+    end
+  end
 end
