@@ -20,11 +20,11 @@ RSpec.describe 'Items Show API' do
     it 'returns 404 with invalid id' do
       create(:merchant)
       create_list(:item, 10)
-
+      item_id = "10"
       get '/api/v1/items/11'
       expect(response).to have_http_status(404)
 
-      get "/api/v1/items/'11'"
+      get "/api/v1/items/#{item_id}"
       expect(response).to have_http_status(404)
     end
   end
