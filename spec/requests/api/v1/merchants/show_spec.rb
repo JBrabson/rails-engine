@@ -1,5 +1,5 @@
 require 'rails_helper'
-RSpec.describe 'Merchants API' do
+RSpec.describe 'Merchants Show API' do
   before :each do
     FactoryBot.reload
   end
