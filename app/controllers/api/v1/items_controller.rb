@@ -17,14 +17,21 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def create
-
     item = Item.create(item_params)
     if item.save
       render json: ItemSerializer.new(item), status: :created
     end
   end
 
-
+  def update
+    item = Item.find(params[:id])
+    item.update(item_params)
+    if item.save
+      render json: ItemSerializer.new(item)
+    else
+      render json: {data: {}}, status: 400
+    end
+  end
 
   private
 
