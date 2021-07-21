@@ -33,16 +33,26 @@ RSpec.describe 'Items API' do
     end
 
     it 'first page of 20 matches first 20 in database' do
-      create_list(:merchant, 2)
-      create_list(:item, 35)
-      items = Item.all
-
-      get '/api/v1/items'
-      items_json = JSON.parse(response.body, symbolize_names: true)
-
-      expect(items_json[:data].count).to eq(20)
-      expect(items_json[:data].first[:id]).to eq(items.first.id.to_s)
-      expect(items_json[:data].last[:id]).to eq(items.last.id.to_s)
+      merchant = create(:merchant)
+      80.times do |index|
+        Item.create!(name: "Item-#{index + 1}", description: Faker::GreekPhilosophers.quote, unit_price: Faker::Commerce.price, merchant: merchant)
+      end
+      get '/api/v1/items?page=1'
+      expect(response).to be_successful
+      items = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(items.count).to eq(20)
+      expect(items.first[:attributes][:name]).to eq("Item-1")
+      expect(items.last[:attributes][:name]).to eq("Item-20")
+      # create_list(:merchant, 2)
+      # create_list(:item, 35)
+      # items = Item.all
+      #
+      # get '/api/v1/items'
+      # items_json = JSON.parse(response.body, symbolize_names: true)
+      #
+      # expect(items_json[:data].count).to eq(20)
+      # expect(items_json[:data].first[:id]).to eq(items.first.id.to_s)
+      # expect(items_json[:data].last[:id]).to eq(items.last.id.to_s)
     end
 
     it 'returns unique list on each page' do
