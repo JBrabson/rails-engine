@@ -2,23 +2,23 @@ require 'rails_helper'
 RSpec.describe 'Items API' do
   before :each do
     FactoryBot.reload
+    Item.destroy_all
   end
 
   describe 'Happy Path' do
     it 'returns list of all items, with default of 20 per page' do
-      create_list(:merchant, 7)
-      create_list(:item, 36)
-      get '/api/v1/items'
-
+      merchant = create(:merchant)
+      36.times do |index|
+        Item.create!(name: "Item-#{index + 1}", description: Faker::GreekPhilosophers.quote, unit_price: Faker::Commerce.price, merchant: merchant)
+      end
+      get '/api/v1/items?page=1'
       expect(response).to be_successful
+      items = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(items.count).to eq(20)
+      expect(items.first[:attributes][:name]).to eq("Item-1")
+      expect(items.last[:attributes][:name]).to eq("Item-20")
 
-      items = JSON.parse(response.body, symbolize_names: true)
-      expect(Item.all.count).to eq(36)
-      expect(items[:data].count).to eq(20)
-      expect(items[:data].first[:id]).to eq('1')
-      expect(items[:data].last[:id]).to eq('20')
-
-      items[:data].each do |item|
+      items.each do |item|
         expect(item).to have_key(:id)
         expect(item[:id]).to be_a(String)
         expect(item[:attributes]).to have_key(:name)
@@ -70,16 +70,21 @@ RSpec.describe 'Items API' do
     it 'allows user to choose per_page value and page' do
       per_page = 25
       page = 2
-      create_list(:item, 50)
+      merchant = create(:merchant)
+
+      70.times do |index|
+        Item.create!(name: "Item-#{index + 1}", description: Faker::GreekPhilosophers.quote, unit_price: Faker::Commerce.price, merchant: merchant)
+      end
+
       get "/api/v1/items?per_page=#{per_page}&page=#{page}"
 
       expect(response).to be_successful
+      expect(Item.count).to eq(70)
 
-      items = JSON.parse(response.body, symbolize_names: true)
-      expect(Item.all.count).to eq(50)
-      expect(items[:data].count).to eq(25)
-      expect(items[:data].first[:id]).to eq('26')
-      expect(items[:data].last[:id]).to eq('50')
+      items = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(items.count).to eq(25)
+      expect(items.first[:attributes][:name]).to eq("Item-26")
+      expect(items.last[:attributes][:name]).to eq("Item-50")
     end
 
 

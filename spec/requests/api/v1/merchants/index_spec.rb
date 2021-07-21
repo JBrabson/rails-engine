@@ -2,22 +2,28 @@ require 'rails_helper'
 RSpec.describe 'Merchants API' do
   before :each do
     FactoryBot.reload
+    Merchant.destroy_all
   end
 
   describe 'Happy Path' do
     it 'returns list of all merchants, with default of 20 per page' do
-      create_list(:merchant, 50)
-      get '/api/v1/merchants'
+      36.times do |index|
+        Merchant.create!(name: "Merchant-#{index + 1}")
+      end
 
+      get '/api/v1/merchants'
       expect(response).to be_successful
 
-      merchants = JSON.parse(response.body, symbolize_names: true)
-      expect(Merchant.all.count).to eq(50)
-      expect(merchants[:data].count).to eq(20)
-      expect(merchants[:data].first[:id]).to eq('1')
-      expect(merchants[:data].last[:id]).to eq('20')
+      merchants = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(merchants.count).to eq(20)
+      expect(merchants.first[:attributes][:name]).to eq("Merchant-1")
+      expect(merchants.last[:attributes][:name]).to eq("Merchant-20")
 
-      merchants[:data].each do |merchant|
+      get '/api/v1/merchants?page=2'
+      merchants = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(merchants.count).to eq(16)
+
+      merchants.each do |merchant|
         expect(merchant).to have_key(:id)
         expect(merchant[:id]).to be_a(String)
         expect(merchant).to have_key(:type)
@@ -30,15 +36,17 @@ RSpec.describe 'Merchants API' do
     end
 
     it 'first page of 20 matches first 20 in database' do
-      create_list(:merchant, 35)
-      merchants = Merchant.all
+      36.times do |index|
+        Merchant.create!(name: "Merchant-#{index + 1}")
+      end
 
-      get '/api/v1/merchants'
-      merchants_json = JSON.parse(response.body, symbolize_names: true)
+      get '/api/v1/merchants?page=1'
+      expect(response).to be_successful
 
-      expect(merchants_json[:data].count).to eq(20)
-      expect(merchants_json[:data].first[:id]).to eq(merchants.first.id.to_s)
-      expect(merchants_json[:data].last[:id]).to eq(merchants.last.id.to_s)
+      merchants = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(merchants.count).to eq(20)
+      expect(merchants.first[:attributes][:name]).to eq("Merchant-1")
+      expect(merchants.last[:attributes][:name]).to eq("Merchant-20")
     end
 
     it 'returns unique list on each page' do
