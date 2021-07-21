@@ -18,7 +18,7 @@ RSpec.describe 'Items New API' do
       }
 
       post "/api/v1/items", params: item_params
-      # expect(response).to have_http_status(201)
+      expect(response).to have_http_status(201)
       item = JSON.parse(response.body, symbolize_names: true)
 
       expect(item[:data]).to have_key(:id)
@@ -32,8 +32,6 @@ RSpec.describe 'Items New API' do
       expect(item[:data][:attributes][:unit_price]).to be_a(Float)
       expect(item[:data][:attributes]).to have_key(:merchant_id)
       expect(item[:data][:attributes][:merchant_id]).to be_an(Integer)
-#TODO test for json response hash for Item
-#TODO test for status
     end
 
 
@@ -43,8 +41,24 @@ RSpec.describe 'Items New API' do
     # end
   end
 
-  # describe 'Sad Path' do
-  #   it '' do
-  #   end
-  # end
+  describe 'Sad Path' do
+    it 'returns error if attribute is missing' do
+      merchant = create(:merchant)
+      # items = create(:item)
+      # expect(Item.count).to eq(1)
+
+      item_params = {
+        name: 'New Item',
+        description: 'Shiny & New',
+        unit_price: '',
+        merchant_id: merchant.id
+      }
+
+      expect(Item.count).to eq(0)
+      post "/api/v1/items", params: item_params
+      expect(response).to have_http_status(204)
+      #TODO error specifically 400 or 204 valid?
+      expect(Item.count).to eq(0)
+    end
+  end
 end

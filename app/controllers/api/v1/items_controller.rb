@@ -13,11 +13,17 @@ class Api::V1::ItemsController < ApplicationController
     render json: ItemSerializer.new(item)
   end
 
-  def create
-    merchant = Merchant.find(params[:merchant_id])
-    item = merchant.items.create(item_params)
-    render json: ItemSerializer.new(item)
+  def new
   end
+
+  def create
+
+    item = Item.create(item_params)
+    if item.save
+      render json: ItemSerializer.new(item), status: :created
+    end
+  end
+
 
 
   private
