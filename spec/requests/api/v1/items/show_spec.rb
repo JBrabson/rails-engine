@@ -14,35 +14,27 @@ RSpec.describe 'Items Show API' do
       end
 
       item1 = Item.first
-
       get "/api/v1/items/#{item1.id}"
-      expect(response.status).to eq(200)
+
       item = JSON.parse(response.body, symbolize_names: true)
       expect(item.count).to eq(1)
-      expect(item[:data]).to have_key(:id)
-      expect(item[:data][:id]).to be_a(String)
-      expect(item[:data][:id]).to eq("#{item1.id.to_s}")
-      expect(item[:data][:attributes]).to have_key(:name)
-      expect(item[:data][:attributes][:name]).to be_a(String)
-      expect(item[:data][:attributes]).to have_key(:description)
-      expect(item[:data][:attributes][:description]).to be_a(String)
-      expect(item[:data][:attributes]).to have_key(:unit_price)
-      expect(item[:data][:attributes][:unit_price]).to be_a(Float)
-      expect(item[:data][:attributes]).to have_key(:merchant_id)
-      expect(item[:data][:attributes][:merchant_id]).to be_an(Integer)
+      expect(item[:data][:id]).to eq("#{item1.id}")
+      expect(item[:data][:attributes][:name]).to eq("#{item1.name}")
+      expect(item[:data][:attributes][:description]).to eq("#{item1.description}")
+      expect(item[:data][:attributes][:unit_price]).to eq(item1.unit_price)
+      expect(item[:data][:attributes][:merchant_id]).to eq(item1.merchant_id)
     end
   end
 
   describe 'Sad Path' do
     it 'returns 404 with invalid id' do
-      create(:merchant)
-      create_list(:item, 10)
-      # item_id = "10"
-      get '/api/v1/items/11'
-      expect(response).to have_http_status(404)
+      merchant = create(:merchant)
+      item = create(:item, merchant: merchant)
+      invalid = item.id + 1
 
-      # get "/api/v1/items/#{item_id}"
-      # expect(response).to have_http_status(404)
+      get "/api/v1/items/#{invalid}"
+
+      expect(response).to have_http_status(404)
     end
   end
 end
