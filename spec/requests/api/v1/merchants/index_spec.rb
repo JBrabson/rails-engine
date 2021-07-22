@@ -48,7 +48,7 @@ RSpec.describe 'Merchants API' do
       expect(merchants.last[:attributes][:name]).to eq("Merchant-20")
     end
 
-    it 'returns unique list or merchants on each page' do
+    it 'returns unique list of merchants on each page' do
       create_list(:merchant, 50)
 
       get '/api/v1/merchants'
@@ -66,9 +66,9 @@ RSpec.describe 'Merchants API' do
       page = 2
 
       get "/api/v1/merchants?per_page=#{per_page}&page=#{page}"
-
       merchants = JSON.parse(response.body, symbolize_names: true)
-      expect(Merchant.all.count).to eq(50)
+
+      expect(Merchant.count).to eq(50)
       expect(merchants[:data].count).to eq(25)
       expect(merchants[:data].first[:id]).to eq('26')
       expect(merchants[:data].last[:id]).to eq('50')

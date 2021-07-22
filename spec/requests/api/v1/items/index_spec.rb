@@ -11,14 +11,20 @@ RSpec.describe 'Items API' do
       36.times do |index|
         Item.create!(name: "Item-#{index + 1}", description: Faker::GreekPhilosophers.quote, unit_price: Faker::Commerce.price, merchant: merchant)
       end
+
       get '/api/v1/items?page=1'
-      expect(response).to be_successful
+
       items = JSON.parse(response.body, symbolize_names: true)[:data]
       expect(items.count).to eq(20)
       expect(items.first[:attributes][:name]).to eq("Item-1")
       expect(items.last[:attributes][:name]).to eq("Item-20")
 
+      get '/api/v1/items?page=2'
+      items = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(items.count).to eq(16)
+
       items.each do |item|
+        expect(item).to be_a(Hash)
         expect(item).to have_key(:id)
         expect(item[:id]).to be_a(String)
         expect(item[:attributes]).to have_key(:name)
@@ -37,8 +43,9 @@ RSpec.describe 'Items API' do
       80.times do |index|
         Item.create!(name: "Item-#{index + 1}", description: Faker::GreekPhilosophers.quote, unit_price: Faker::Commerce.price, merchant: merchant)
       end
+
       get '/api/v1/items?page=1'
-      expect(response).to be_successful
+
       items = JSON.parse(response.body, symbolize_names: true)[:data]
       expect(items.count).to eq(20)
       expect(items.first[:attributes][:name]).to eq("Item-1")
@@ -55,9 +62,10 @@ RSpec.describe 'Items API' do
       # expect(items_json[:data].last[:id]).to eq(items.last.id.to_s)
     end
 
-    it 'returns unique list on each page' do
+    it 'returns unique list of items on each page' do
       create_list(:merchant, 7)
       create_list(:item, 40)
+
       get '/api/v1/items'
       items_pg1 = JSON.parse(response.body, symbolize_names: true)
 
@@ -71,39 +79,36 @@ RSpec.describe 'Items API' do
       per_page = 25
       page = 2
       merchant = create(:merchant)
-
       70.times do |index|
         Item.create!(name: "Item-#{index + 1}", description: Faker::GreekPhilosophers.quote, unit_price: Faker::Commerce.price, merchant: merchant)
       end
 
       get "/api/v1/items?per_page=#{per_page}&page=#{page}"
-
-      expect(response).to be_successful
-      expect(Item.count).to eq(70)
-
       items = JSON.parse(response.body, symbolize_names: true)[:data]
+
+      expect(Item.count).to eq(70)
       expect(items.count).to eq(25)
       expect(items.first[:attributes][:name]).to eq("Item-26")
       expect(items.last[:attributes][:name]).to eq("Item-50")
     end
 
 
-    it 'fetch second page of 20 items, containing no data, to return empty array' do
+    it 'returns empty array for page containing no items' do
       create_list(:item, 20)
+
       get '/api/v1/items?page=2'
 
-      expect(response).to be_successful
       items = JSON.parse(response.body, symbolize_names: true)
 
       expect(Item.all.count).to eq(20)
       expect(items[:data]).to eq([])
     end
 
-    it 'fetch all items if per_page count is high' do
+    it 'returns all items if per_page count is high' do
       create_list(:item, 201)
+
       get '/api/v1/items?per_page=200'
 
-      expect(response).to be_successful
       items = JSON.parse(response.body, symbolize_names: true)
 
       expect(items[:data].count).to eq(201)
@@ -111,8 +116,8 @@ RSpec.describe 'Items API' do
   end
 
   describe 'Sad Path' do
-    it 'fetching page 1 if page is 0 or lower' do
-      create_list(:merchant, 2)
+    it 'returns page 1 if page selected is 0 or lower' do
+      create(:merchant)
       create_list(:item, 30)
 
       get '/api/v1/items?page=1'
@@ -120,9 +125,9 @@ RSpec.describe 'Items API' do
 
       get '/api/v1/items?page=0'
       page0 = JSON.parse(response.body, symbolize_names: true)
+
       expect(response).to be_successful
       expect(page1[:data].count).to eq(20)
-
       expect(page1).to eq(page0)
     end
   end
