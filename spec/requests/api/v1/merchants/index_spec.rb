@@ -12,7 +12,6 @@ RSpec.describe 'Merchants API' do
       end
 
       get '/api/v1/merchants'
-      expect(response).to be_successful
 
       merchants = JSON.parse(response.body, symbolize_names: true)[:data]
       expect(merchants.count).to eq(20)
@@ -24,6 +23,7 @@ RSpec.describe 'Merchants API' do
       expect(merchants.count).to eq(16)
 
       merchants.each do |merchant|
+        expect(merchant).to be_a(Hash)
         expect(merchant).to have_key(:id)
         expect(merchant[:id]).to be_a(String)
         expect(merchant).to have_key(:type)
@@ -41,7 +41,6 @@ RSpec.describe 'Merchants API' do
       end
 
       get '/api/v1/merchants?page=1'
-      expect(response).to be_successful
 
       merchants = JSON.parse(response.body, symbolize_names: true)[:data]
       expect(merchants.count).to eq(20)
@@ -49,8 +48,9 @@ RSpec.describe 'Merchants API' do
       expect(merchants.last[:attributes][:name]).to eq("Merchant-20")
     end
 
-    it 'returns unique list on each page' do
+    it 'returns unique list or merchants on each page' do
       create_list(:merchant, 50)
+
       get '/api/v1/merchants'
       merchants1 = JSON.parse(response.body, symbolize_names: true)
 
@@ -61,12 +61,11 @@ RSpec.describe 'Merchants API' do
     end
 
     it 'allows user to choose per_page value and page' do
+      create_list(:merchant, 50)
       per_page = 25
       page = 2
-      create_list(:merchant, 50)
-      get "/api/v1/merchants?per_page=#{per_page}&page=#{page}"
 
-      expect(response).to be_successful
+      get "/api/v1/merchants?per_page=#{per_page}&page=#{page}"
 
       merchants = JSON.parse(response.body, symbolize_names: true)
       expect(Merchant.all.count).to eq(50)
@@ -74,24 +73,23 @@ RSpec.describe 'Merchants API' do
       expect(merchants[:data].first[:id]).to eq('26')
       expect(merchants[:data].last[:id]).to eq('50')
     end
-  #TODO edgecase for incorrect inputs
 
-    it 'fetch second page of 20 merchants, containing no data, to return empty array' do
+    it 'returns empty array for page containing no merchants' do
       create_list(:merchant, 20)
+
       get '/api/v1/merchants?page=2'
 
-      expect(response).to be_successful
       merchants = JSON.parse(response.body, symbolize_names: true)
 
       expect(Merchant.all.count).to eq(20)
       expect(merchants[:data]).to eq([])
     end
 
-    it 'fetch all merchants if per_page count is high' do
+    it 'returns all merchants if per_page count is high' do
       create_list(:merchant, 201)
+
       get '/api/v1/merchants?per_page=200'
 
-      expect(response).to be_successful
       merchants = JSON.parse(response.body, symbolize_names: true)
 
       expect(merchants[:data].count).to eq(201)
@@ -99,7 +97,7 @@ RSpec.describe 'Merchants API' do
   end
 
   describe 'Sad Path' do
-    it 'fetching page 1 if page selected is 0 or lower' do
+    it 'returns page 1 if page selected is 0 or lower' do
       create_list(:merchant, 50)
 
       get '/api/v1/merchants?page=1'
@@ -107,9 +105,9 @@ RSpec.describe 'Merchants API' do
 
       get '/api/v1/merchants?page=0'
       page0 = JSON.parse(response.body, symbolize_names: true)
+
       expect(response).to be_successful
       expect(page1[:data].count).to eq(20)
-
       expect(page1).to eq(page0)
     end
   end
