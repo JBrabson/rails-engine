@@ -33,6 +33,18 @@ class Api::V1::ItemsController < ApplicationController
     end
   end
 
+  def destroy
+    item = Item.find(params[:id])
+    invoices = item.invoices
+
+    invoices.map do |invoice|
+      invoice.items.count = 1
+      invoice.destroy
+    end
+
+    item.destroy
+  end
+
   private
 
   def item_params
