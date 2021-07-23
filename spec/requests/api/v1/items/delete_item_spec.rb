@@ -17,17 +17,17 @@ RSpec.describe 'Item Delete API' do
       expect(Item.first.id).to_not eq(item1_id)
     end
 
-    # it 'can delete invoices associated with item' do
-    #   customer = create(:customer)
-    #   merchant = create(:merchant)
-    #   transaction = create(:transaction)
-    #   invoice_item = create(:invoice_item)
-    #   item = create(:item)
-    #
-    #   delete "/api/v1/items/#{item.id}"
-    #   expect(item.invoices).to eq([])
-    # end
-    #
+    it 'can delete invoices associated with item' do
+      customer = create(:customer)
+      merchant = create(:merchant)
+      transaction = create(:transaction)
+      invoice_item = create(:invoice_item)
+      item = create(:item)
+
+      delete "/api/v1/items/#{item.id}"
+      expect(item.invoices).to eq([])
+    end
+
     # it 'will only delete invoices associated with item, if no other items are listed on invoice' do
     #   customer = create(:customer)
     #   merchant = create(:merchant)
@@ -43,23 +43,5 @@ RSpec.describe 'Item Delete API' do
   end
 
   # describe 'Sad Path' do
-  #   it 'returns error if attribute is missing' do
-  #     merchant = create(:merchant)
-  #     # items = create(:item)
-  #     # expect(Item.count).to eq(1)
-  #
-  #     item_params = {
-  #       name: 'New Item',
-  #       description: 'Shiny & New',
-  #       unit_price: '',
-  #       merchant_id: merchant.id
-  #     }
-  #
-  #     expect(Item.count).to eq(0)
-  #     post "/api/v1/items", params: item_params
-  #     expect(response).to have_http_status(204)
-  #     #TODO error specifically 400 or 204 valid?
-  #     expect(Item.count).to eq(0)
-  #   end
   # end
 end

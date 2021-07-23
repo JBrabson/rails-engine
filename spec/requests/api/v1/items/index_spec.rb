@@ -50,16 +50,6 @@ RSpec.describe 'Items API' do
       expect(items.count).to eq(20)
       expect(items.first[:attributes][:name]).to eq("Item-1")
       expect(items.last[:attributes][:name]).to eq("Item-20")
-      # create_list(:merchant, 2)
-      # create_list(:item, 35)
-      # items = Item.all
-      #
-      # get '/api/v1/items'
-      # items_json = JSON.parse(response.body, symbolize_names: true)
-      #
-      # expect(items_json[:data].count).to eq(20)
-      # expect(items_json[:data].first[:id]).to eq(items.first.id.to_s)
-      # expect(items_json[:data].last[:id]).to eq(items.last.id.to_s)
     end
 
     it 'returns unique list of items on each page' do

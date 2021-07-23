@@ -28,7 +28,9 @@ RSpec.describe "Merchant's Items API" do
 
   describe 'Sad Path' do
     it 'returns 404 with invalid id' do
-      get '/api/v1/merchants/2/items'
+      merchant = create(:merchant)
+      items = create_list(:item, 7, merchant: merchant)
+      get "/api/v1/merchants/#{merchant.id + 1}/items"
       expect(response).to have_http_status(404)
     end
   end

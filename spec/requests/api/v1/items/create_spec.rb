@@ -1,5 +1,5 @@
 require 'rails_helper'
-RSpec.describe 'Items New API' do
+RSpec.describe 'Item Create API' do
   before :each do
     FactoryBot.reload
   end
@@ -7,8 +7,6 @@ RSpec.describe 'Items New API' do
   describe 'Happy Path' do
     it 'can create new item' do
       merchant = create(:merchant)
-      # items = create(:item)
-      # expect(Item.count).to eq(1)
 
       item_params = {
         name: 'New Item',
@@ -19,34 +17,21 @@ RSpec.describe 'Items New API' do
 
       post "/api/v1/items", params: item_params
       expect(response).to have_http_status(201)
-      item = JSON.parse(response.body, symbolize_names: true)
 
-      expect(item[:data]).to have_key(:id)
-      expect(item[:data][:id]).to be_a(String)
-      expect(item[:data][:attributes]).to have_key(:name)
-      expect(item[:data][:attributes][:name]).to be_a(String)
-      expect(item[:data][:attributes][:name]).to eq('New Item')
-      expect(item[:data][:attributes]).to have_key(:description)
-      expect(item[:data][:attributes][:description]).to be_a(String)
-      expect(item[:data][:attributes]).to have_key(:unit_price)
-      expect(item[:data][:attributes][:unit_price]).to be_a(Float)
-      expect(item[:data][:attributes]).to have_key(:merchant_id)
-      expect(item[:data][:attributes][:merchant_id]).to be_an(Integer)
+      item = JSON.parse(response.body, symbolize_names: true)[:data]
+
+      expect(item).to have_key(:id)
+      expect(item[:id]).to be_a(String)
+      expect(item[:attributes][:name]).to eq(item_params[:name])
+      expect(item[:attributes][:description]).to eq(item_params[:description])
+      expect(item[:attributes][:unit_price]).to eq(item_params[:unit_price])
+      expect(item[:attributes][:merchant_id]).to eq(item_params[:merchant_id])
     end
-
-
-
-
-    # it 'can delete item' do
-    # end
   end
 
   describe 'Sad Path' do
     it 'returns error if attribute is missing' do
       merchant = create(:merchant)
-      # items = create(:item)
-      # expect(Item.count).to eq(1)
-
       item_params = {
         name: 'New Item',
         description: 'Shiny & New',
@@ -54,11 +39,13 @@ RSpec.describe 'Items New API' do
         merchant_id: merchant.id
       }
 
-      expect(Item.count).to eq(0)
       post "/api/v1/items", params: item_params
-      expect(response).to have_http_status(204)
-      #TODO error specifically 400 or 204 valid?
+
+      item = JSON.parse(response.body, symbolize_names: true)
       expect(Item.count).to eq(0)
+      expect(item[:data]).to eq(nil)
+      expect(item[:errors]).to eq(['Field(s) Missing'])
+      expect(response).to have_http_status(:bad_request)
     end
   end
 end

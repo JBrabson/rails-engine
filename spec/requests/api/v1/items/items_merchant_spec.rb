@@ -17,7 +17,6 @@ RSpec.describe "Item's Merchant API" do
     end
   end
 
-#TODO
   # describe 'Sad Path' do
   #   it 'returns 404 if item not found' do
   #     expect(response).to have_http_status(404)

@@ -10,7 +10,6 @@ RSpec.describe 'Merchants Search API' do
       search_term = 'fin'
 
       get "/api/v1/merchants/find?name_search=#{search_term}"
-      # expect(response).to be_successful
       merchant = JSON.parse(response.body, symbolize_names: true)
       expect(merchant.count).to eq(1)
       expect(merchant).to be_a Hash
@@ -31,7 +30,6 @@ RSpec.describe 'Merchants Search API' do
       search_term = 'fin'
 
       get "/api/v1/merchants/find?name_search=#{search_term}"
-      # expect(response).to be_successful
       merchant = JSON.parse(response.body, symbolize_names: true)
       expect(merchant.count).to eq(1)
       expect(merchant[:data][:attributes][:name]).to eq(fast.name)
@@ -44,7 +42,6 @@ RSpec.describe 'Merchants Search API' do
       search_term = 'fIn'
 
       get "/api/v1/merchants/find?name_search=#{search_term}"
-      # expect(response).to be_successful
       merchant = JSON.parse(response.body, symbolize_names: true)
       expect(merchant.count).to eq(1)
       expect(merchant[:data][:attributes][:name]).to eq(fast.name)
@@ -52,8 +49,16 @@ RSpec.describe 'Merchants Search API' do
   end
 
   describe 'Sad Path' do
-    it '' do
+    it 'returns error message within object if merchant not found' do
+      huck = create(:merchant, name: 'Huckleberry Finn')
+      finn = create(:merchant, name: 'Finneas Smitherton')
+      search_term = 'wee'
 
+      get "/api/v1/merchants/find?name_search=#{search_term}"
+      merchant = JSON.parse(response.body, symbolize_names: true)
+      expect(merchant[:data]).to eq({})
+      expect(merchant[:errors]).to eq(['No Matches for Your Search'])
+      expect(response).to have_http_status(:not_found)
     end
   end
 end

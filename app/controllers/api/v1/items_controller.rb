@@ -20,6 +20,8 @@ class Api::V1::ItemsController < ApplicationController
     item = Item.create(item_params)
     if item.save
       render json: ItemSerializer.new(item), status: :created
+    else
+      render json: {errors: ['Field(s) Missing']}, status: :bad_request
     end
   end
 
@@ -29,7 +31,7 @@ class Api::V1::ItemsController < ApplicationController
     if item.save
       render json: ItemSerializer.new(item)
     else
-      render json: {data: {}}, status: 400
+      render json: {errors: ['Field(s) Missing']}, status: 400
     end
   end
 

@@ -41,38 +41,10 @@ RSpec.describe 'Items Update API' do
       expect(json[:data][:attributes][:unit_price]).to eq(newer_params[:unit_price])
       expect(json[:data][:attributes][:merchant_id]).to eq(item[:merchant_id])
     end
+    # UDPATING LESS THAN ALL ATTRIBUTES
   end
-    # TEST FOR UDPATING LESS THAN ALL ATTRIBUTES
 
-
-
-
-  #
-  #
-  #
-  #
-  #   # it 'can delete item' do
-  #   # end
-  # end
-  #
   # describe 'Sad Path' do
-  #   it 'returns error if attribute is missing' do
-  #     merchant = create(:merchant)
-  #     # items = create(:item)
-  #     # expect(Item.count).to eq(1)
-  #
-  #     item_params = {
-  #       name: 'New Item',
-  #       description: 'Shiny & New',
-  #       unit_price: '',
-  #       merchant_id: merchant.id
-  #     }
-  #
-  #     expect(Item.count).to eq(0)
-  #     post "/api/v1/items", params: item_params
-  #     expect(response).to have_http_status(204)
-  #     #TODO error specifically 400 or 204 valid?
-  #     expect(Item.count).to eq(0)
-  #   end
+  # NOT FOUND
   # end
 end
